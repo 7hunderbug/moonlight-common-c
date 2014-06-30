@@ -9,8 +9,7 @@ typedef struct _NV_VIDEO_PACKET {
 	int totalPackets;
 	int flags;
 	int payloadLength;
-	int streamPacketIndex;
-	char reserved2[32];
+	char reserved2[36];
 } NV_VIDEO_PACKET, *PNV_VIDEO_PACKET;
 
 typedef struct _RTP_PACKET {

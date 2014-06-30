@@ -8,15 +8,6 @@ void BbInitializeWrappedBuffer(PBYTE_BUFFER buff, char* data, int offset, int le
 	buff->byteOrder = byteOrder;
 }
 
-static long long byteSwapLongLong(PBYTE_BUFFER buff, long long l) {
-	if (buff->byteOrder == BYTE_ORDER_BIG) {
-		return HTONLL(l);
-	}
-	else {
-		return l;
-	}
-}
-
 static int byteSwapInt(PBYTE_BUFFER buff, int i) {
 	if (buff->byteOrder == BYTE_ORDER_BIG) {
 		return htonl(i);
@@ -72,19 +63,6 @@ int BbGetInt(PBYTE_BUFFER buff, int *i) {
 	return 1;
 }
 
-int BbGetLong(PBYTE_BUFFER buff, long long *l) {
-	if (buff->position + sizeof(*l) > buff->length) {
-		return 0;
-	}
-
-	memcpy(l, &buff->buffer[buff->position], sizeof(*l));
-	buff->position += sizeof(*l);
-
-	*l = byteSwapLongLong(buff, *l);
-
-	return 1;
-}
-
 int BbPutInt(PBYTE_BUFFER buff, int i) {
 	if (buff->position + sizeof(i) > buff->length) {
 		return 0;
@@ -94,19 +72,6 @@ int BbPutInt(PBYTE_BUFFER buff, int i) {
 
 	memcpy(&buff->buffer[buff->position], &i, sizeof(i));
 	buff->position += sizeof(i);
-
-	return 1;
-}
-
-int BbPutLong(PBYTE_BUFFER buff, long long l) {
-	if (buff->position + sizeof(l) > buff->length) {
-		return 0;
-	}
-
-	l = byteSwapLongLong(buff, l);
-
-	memcpy(&buff->buffer[buff->position], &l, sizeof(l));
-	buff->position += sizeof(l);
 
 	return 1;
 }

@@ -12,7 +12,6 @@ static int nextPacketNumber;
 static int startFrameNumber = 1;
 static int waitingForNextSuccessfulFrame;
 static int gotNextFrameStart;
-static int lastPacketInStream = 0;
 
 static LINKED_BLOCKING_QUEUE decodeUnitQueue;
 static int packetSize;
@@ -127,9 +126,6 @@ static void reassembleFrame(int frameNumber) {
 				// FIXME: Get proper lower bound
 				connectionSinkTooSlow(0, frameNumber);
 			}
-
-			// Notify the control connection
-			connectionReceivedFrame(frameNumber);
 		}
 	}
 }
@@ -338,13 +334,6 @@ void processRtpPayload(PNV_VIDEO_PACKET videoPacket, int length) {
 			}
 		}
 	}
-
-	streamPacketIndex = videoPacket->streamPacketIndex;
-	if (streamPacketIndex != (int) (lastPacketInStream + 1)) {
-		// Packets were lost so report this to the server
-		connectionLostPackets(lastPacketInStream, streamPacketIndex);
-	}
-	lastPacketInStream = streamPacketIndex;
 
 	nextPacketNumber++;
 
