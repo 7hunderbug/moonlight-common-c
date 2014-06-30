@@ -7,7 +7,7 @@ static CONNECTION_LISTENER_CALLBACKS ListenerCallbacks;
 static const char* stageNames[STAGE_MAX] = {
 	"none",
 	"platform initialization",
-	"RTSP handshake",
+	"handshake",
 	"control stream initialization",
 	"video stream initialization",
 	"audio stream initialization",
@@ -71,9 +71,9 @@ void LiStopConnection(void) {
 		stage--;
 		Limelog("done\n");
 	}
-	if (stage == STAGE_RTSP_HANDSHAKE) {
-		Limelog("Terminating RTSP handshake...");
-		terminateRtspHandshake();
+	if (stage == STAGE_HANDSHAKE) {
+		Limelog("Terminating handshake...");
+		terminateHandshake();
 		stage--;
 		Limelog("done\n");
 	}
@@ -112,17 +112,17 @@ int LiStartConnection(IP_ADDRESS host, PSTREAM_CONFIGURATION streamConfig, PCONN
 	ListenerCallbacks.stageComplete(STAGE_PLATFORM_INIT);
 	Limelog("done\n");
 
-	Limelog("Starting RTSP handshake...");
-	ListenerCallbacks.stageStarting(STAGE_RTSP_HANDSHAKE);
-	err = performRtspHandshake(host, streamConfig);
+	Limelog("Starting handshake...");
+	ListenerCallbacks.stageStarting(STAGE_HANDSHAKE);
+	err = performHandshake(host);
 	if (err != 0) {
 		Limelog("failed: %d\n", err);
-		ListenerCallbacks.stageFailed(STAGE_RTSP_HANDSHAKE, err);
+		ListenerCallbacks.stageFailed(STAGE_HANDSHAKE, err);
 		goto Cleanup;
 	}
 	stage++;
-	LC_ASSERT(stage == STAGE_RTSP_HANDSHAKE);
-	ListenerCallbacks.stageComplete(STAGE_RTSP_HANDSHAKE);
+	LC_ASSERT(stage == STAGE_HANDSHAKE);
+	ListenerCallbacks.stageComplete(STAGE_HANDSHAKE);
 	Limelog("done\n");
 
 	Limelog("Initializing control stream...");
